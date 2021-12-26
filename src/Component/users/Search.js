@@ -1,34 +1,49 @@
-import React, { Component } from "react";
+import React, { useState ,useContext} from "react";
+import githubContext from "../../context/github/githubContext";
+import alertContext from "../../context/alert/alertContext";
+const Search= ()=>{
+  const GithubContext =useContext(githubContext)
+  const AlertContext = useContext(alertContext)
+  const [text,setText]=useState('')
 
-export class Search extends Component {
-    state={
-        text:'' 
-    }
 
-onChange=(e)=>{
-this.setState({[e.target.name]:e.target.value})
+const onChange=(e)=>{
+setText(e.target.value)
 }
 
-onSubmit=(e)=>{
+const onSubmit=(e)=>{
     e.preventDefault();
-   this.props.searchUsers(this.state.text)
+if(text === ''){
+AlertContext.setAlerts('Please enter Something','Light')
+}
+else{
+  GithubContext.searchUsers(text)
+
+}
 }
 
-  render() {
+const clearUser=(e)=>{
+    e.preventDefault();
+    GithubContext.clearUsers()
+    setText('')
+}
+ 
     return (
       <div>
-        <form onSubmit={this.onSubmit} className="form">
+        <form onSubmit={onSubmit} className="form">
         <input type="text" name='text' placeholder='Searh Users ...'
-        value={this.state.text}
-        onChange={this.onChange}
+        value={text}
+        onChange={onChange}
         ></input>
         <input type='submit'  value='Search' className='btn btn-dark btn-block'></input>
         </form>
-        <button className='btn btn-light btn-block'>Clear</button>
+        {GithubContext.users.length>0 &&  <button className='btn btn-light btn-block' onClick={clearUser}>Clear</button>}
+       
       </div>
       
     );
-  }
+  
 }
+
 
 export default Search;
